@@ -1,6 +1,6 @@
 /* game board table */
 
-#board td {
+#board-table td {
   width: 50px;
   height: 50px;
   border: solid 1px #666;
@@ -13,6 +13,15 @@
   margin: 5px;
   width: 80%;
   height: 80%;
+  border-radius: 50%;
+}
+
+.p1 {
+  background-color: blue;
+}
+
+.p2 {
+  background-color: turquoise;
 }
 
 /* TODO: make pieces red/blue,  depending on player 1/2 piece */

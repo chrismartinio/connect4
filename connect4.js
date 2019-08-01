@@ -1,7 +1,6 @@
 // DOM load stuff
 document.addEventListener("DOMContentLoaded", function () {
   makeBoard();
-  console.log(board);
 });
 
 /** Connect Four
@@ -16,16 +15,16 @@ const HEIGHT = 6;
 
 let currPlayer = 1; // active player: 1 or 2
 let board = []; // array of rows, each row is array of cells  (board[y][x])
-
+let gameBoard = makeBoard();
 /** makeBoard: create in-JS board structure:
  *    board = array of rows, each row is array of cells  (board[y][x])
  */
 
 
 function makeBoard() {
-  for (let i=0; i<HEIGHT; i++) {
+  for (let i = 0; i < HEIGHT; i++) {
     board[i] = [];
-    for (let j=0; j<WIDTH; j++) {
+    for (let j = 0; j < WIDTH; j++) {
       board[i][j] = null;
     }
   }
@@ -35,10 +34,10 @@ function makeBoard() {
 /** makeHtmlBoard: make HTML table and row of column tops. */
 
 function makeHtmlBoard() {
-  // TODO: get "board" letiable from the item in HTML w/ID of "board"
+  // TODO: get "board" variable from the item in HTML w/ID of "board-table"
   let boardTable = document.querySelector('#board-table');
 
-  // TODO: add comment for this code
+  // TODO: creating top row 
   let top = document.createElement("tr");
   top.setAttribute("id", "column-top");
   top.addEventListener("click", handleClick);
@@ -50,7 +49,7 @@ function makeHtmlBoard() {
   }
   boardTable.append(top);
 
-  // TODO: add comment for this code
+  // TODO: creating table 
   for (let y = 0; y < HEIGHT; y++) {
     const row = document.createElement("tr");
     for (let x = 0; x < WIDTH; x++) {
@@ -66,17 +65,23 @@ function makeHtmlBoard() {
 
 function findSpotForCol(x) {
   // TODO: write the real version of this, rather than always returning 0
-  return 0;
+  for (let i = HEIGHT-1; i >= 0; i--) {
+    if (gameBoard[i][x] === null) {
+      return i;
+    }
+  }
+
+  return null;
 }
 
 /** placeInTable: update DOM to place piece into HTML table of board */
 
 function placeInTable(y, x) {
   // TODO: make a div and insert into correct table cell
-  let tableCell = document.querySelector('#y-x');
+  let tableCell = document.getElementById(`${y}-${x}`);
   let cellDiv = document.createElement('div');
-  cellDiv.classList.add(piece);
-  cellDiv.classList.add(currentPlayer);
+  cellDiv.classList.add("piece");
+  cellDiv.classList.add(`p${currPlayer}`);
   tableCell.appendChild(cellDiv);
 }
 
@@ -84,11 +89,28 @@ function placeInTable(y, x) {
 
 function endGame(msg) {
   // TODO: pop up alert message
+  alert(msg);
+}
+
+function lostGame() {
+  alert("GameOver");
+}
+
+function isOver() {
+  for (let i = 0; i < HEIGHT; i++) {
+    for (let j = 0; j < WIDTH; j++) {
+      if (gameBoard[i][j] === null) {
+        return false;
+      }
+    }
+  }
+  return true;
 }
 
 /** handleClick: handle click of column top to play piece */
 
 function handleClick(evt) {
+
   // get x from ID of clicked cell
   let x = +evt.target.id;
 
@@ -101,17 +123,32 @@ function handleClick(evt) {
   // place piece in board and add to HTML table
   // TODO: add line to update in-memory board
   placeInTable(y, x);
+  if(currPlayer === 1) {
+    gameBoard[y][x] = 1;
+  } else if(currPlayer === 2){
+    gameBoard[y][x]  = 2;
+  }
 
   // check for win
   if (checkForWin()) {
-    return endGame(`Player ${currPlayer} won!`);
+     return endGame(`Player ${currPlayer} won!`);
   }
-  
+
   // check for tie
   // TODO: check if all cells in board are filled; if so call, call endGame
+  if (isOver() === true) {
+    lostGame();
+  }
 
   // switch players
   // TODO: switch currPlayer 1 <-> 2
+  if (currPlayer === 1) {
+    //document.getElementById(`${y}-${x}`).querySelector(".piece").style.backgroundColor = "blue";
+    currPlayer = 2;
+  } else if (currPlayer === 2) {
+    //document.getElementById(`${y}-${x}`).querySelector(".piece").style.backgroundColor = "turquoise";
+    currPlayer = 1;
+  }
 }
 
 /** checkForWin: check board cell-by-cell for "does a win start here?" */
@@ -123,12 +160,12 @@ function checkForWin() {
     //  - returns true if all are legal coordinates & all match currPlayer
 
     return cells.every(
-        ([y, x]) =>
-            y >= 0 &&
-            y < HEIGHT &&
-            x >= 0 &&
-            x < WIDTH &&
-            board[y][x] === currPlayer
+      ([y, x]) =>
+        y >= 0 &&
+        y < HEIGHT &&
+        x >= 0 &&
+        x < WIDTH &&
+        board[y][x] === currPlayer
     );
   }
 
@@ -146,7 +183,9 @@ function checkForWin() {
       }
     }
   }
+  console.log(gameBoard);
 }
+
 
 makeBoard();
 makeHtmlBoard();
